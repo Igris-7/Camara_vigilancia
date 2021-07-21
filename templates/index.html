@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cámara de vigilancia con Python, Flask y OpenCV - By Parzibyte</title>
+    <link rel="stylesheet" href="https://unpkg.com/bulma@0.9.1/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
+        integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w=="
+        crossorigin="anonymous" />
+</head>
+    
+<style type="text/css">
+    a.navbar-item:hover{
+        color: #1ABC9C;
+        font-weight: bold;
+    }
+</style>
+
+<body>
+
+    <nav class="navbar is-dark has-text-centered" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="./">
+                <img alt="Logo"
+                    src="https://img-premium.flaticon.com/png/512/141/141806.png?token=exp=1624032632~hmac=6203d4307fcf85d18b5252c565a71c08"
+                    style="max-height: 80px" />
+            </a>
+            <button class="navbar-burger is-dark button has-text-centered" aria-label="menu" aria-expanded="false"
+                data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </button>
+        </div>
+        <div class="navbar-menu is-dark">
+            <div class="navbar-start">
+                <a class="navbar-item" href="./">Vigilar cámara</a>
+            </div>
+              <div class="navbar-end is-dark">
+                <div class="navbar-item">
+                        <a class="button is-primary is-inverted">
+                            <span class="icon">
+                              <i class="fab fa-github"></i>
+                            </span>
+                            <span>Descargar</span>
+                         </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", () => {
+            const boton = document.querySelector(".navbar-burger");
+            const menu = document.querySelector(".navbar-menu");
+            boton.onclick = () => {
+                menu.classList.toggle("is-active");
+                boton.classList.toggle("is-active");
+            };
+        });
+
+
+    </script>
+    <section class="section hero is-dark">
+        <div class="columns">
+            <div class="column has-text-centered">
+                <figure class="image has-text-centered">
+                    <img class="is-inline-block" src="./streaming_camara" style="width: auto">
+                </figure>
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column has-text-centered">
+                <button id="btnIniciarGrabacion" class="button is-success mb-2" title="Iniciar">
+                    <i class="fa fa-circle"></i>
+                </button>
+                <button id="btnDetenerGrabacion" class="button is-danger mb-2" title="Detener">
+                    <i class="fa fa-stop"></i>
+                </button>
+                <div class="notification is-primary mt-2" id="estado">Estado de grabación.</div>
+                <br>
+            </div>
+        </div>
+        <script type="text/javascript">
+            const $btnIniciarGrabacion = document.querySelector("#btnIniciarGrabacion"),
+                $btnDetenerGrabacion = document.querySelector("#btnDetenerGrabacion"),
+                $estado = document.querySelector("#estado");
+
+            const obtenerEstadoDeGrabacionYRefrescarVista = async () => {
+                const respuestaRaw = await fetch("./estado_grabacion");//fetch realizar peticiones http asincronas, si se completa la promesa devuelve valor, sino devuelve valor de rechazo
+                const grabando = await respuestaRaw.json();
+                if (grabando) {
+                    $btnIniciarGrabacion.style.display = "none";
+                    $btnDetenerGrabacion.style.display = "inline";
+                } else {
+                    $btnIniciarGrabacion.style.display = "inline";
+                    $btnDetenerGrabacion.style.display = "none";
+                }
+            };
+            obtenerEstadoDeGrabacionYRefrescarVista();
+            /*
+            
+            /*
+                Iniciar grabación
+            */
+            $btnIniciarGrabacion.onclick = async () => {
+                $estado.textContent = "Iniciando grabación...";
+                const respuestaRaw = await fetch("./comenzar_grabacion");
+                const respuesta = await respuestaRaw.json();
+                if (respuesta) {
+                    $estado.textContent = "Grabación iniciada";
+                    obtenerEstadoDeGrabacionYRefrescarVista();
+                } else {
+                    $estado.textContent = "Error iniciando grabación";
+                    obtenerEstadoDeGrabacionYRefrescarVista();
+                }
+            };
+
+            $btnDetenerGrabacion.onclick = async () => {
+                $estado.textContent = "Deteniendo grabación...";
+                const respuestaRaw = await fetch("./detener_grabacion");
+                const respuesta = await respuestaRaw.json();
+                if (respuesta) {
+                    $estado.textContent = "Grabación detenida";
+                    obtenerEstadoDeGrabacionYRefrescarVista();
+                } else {
+                    $estado.textContent = "Error deteniendo grabación";
+                    obtenerEstadoDeGrabacionYRefrescarVista();
+                }
+            };
+        </script>
+    </section>
+</body>
+
+</html>
